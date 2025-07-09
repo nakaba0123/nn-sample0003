@@ -4,7 +4,7 @@ const cors = require('cors');
 const mysql = require('mysql2');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
@@ -17,15 +17,22 @@ const connection = mysql.createConnection({
   database: process.env.DB_NAME
 });
 
+// MySQL接続確認してからサーバー起動
 connection.connect((err) => {
   if (err) {
     console.error('MySQL接続エラー:', err);
+    process.exit(1); // エラーなら終了
   } else {
     console.log('MySQLに接続成功！');
+
+    // サーバー起動
+    app.listen(PORT, () => {
+      console.log(`サーバーがポート ${PORT} で起動中！`);
+    });
   }
 });
 
-// エンドポイント定義
+// 出勤記録登録用API
 app.post('/attendance', (req, res) => {
   const { name, date, status } = req.body;
 
@@ -38,9 +45,5 @@ app.post('/attendance', (req, res) => {
 
     res.json({ message: '出勤記録を受け取り、保存しました' });
   });
-});
-
-app.listen(PORT, () => {
-  console.log(`サーバーがポート ${PORT} で起動中！`);
 });
 
