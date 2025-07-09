@@ -47,3 +47,17 @@ app.post('/attendance', (req, res) => {
   });
 });
 
+// 勤怠データ一覧取得API
+app.get('/attendance', (req, res) => {
+  const query = 'SELECT * FROM attendance ORDER BY date DESC';
+
+  connection.query(query, (err, results) => {
+    if (err) {
+      console.error('DB取得エラー:', err);
+      return res.status(500).json({ message: 'データ取得に失敗しました' });
+    }
+
+    res.json(results);
+  });
+});
+
