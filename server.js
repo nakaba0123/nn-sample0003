@@ -92,15 +92,24 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
-// ✅ connection.query → pool.query にする
-app.get('/group-homes', (req, res) => {
-  const query = 'SELECT * FROM group_homes';
-  pool.query(query, (err, results) => {
-    if (err) {
-      console.error('DB読み取りエラー:', err);
-      return res.status(500).json({ message: 'データ取得に失敗しました' });
-    }
+const mysql = require('mysql2');
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+});
+
+// 使用時は pool.query()
+pool.query('SELECT * FROM group_homes', (err, results) => {
+  if (err) {
+    console.error('DB読み取りエラー:', err);
+    res.status(500).json({ message: 'データ取得に失敗しました' });
+  } else {
     res.json(results);
-  });
+  }
 });
 
