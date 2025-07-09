@@ -81,3 +81,23 @@ app.listen(PORT, () => {
   console.log(`サーバーがポート ${PORT} で起動中！`);
 });
 
+// グループホーム一覧を取得するエンドポイント
+app.get('/group-homes', (req, res) => {
+  const query = 'SELECT * FROM group_homes';
+
+  connection.query(query, (err, results) => {
+    if (err) {
+      console.error('DB読み取りエラー:', err);
+      return res.status(500).json({ message: 'データ取得に失敗しました' });
+    }
+
+    // residentRooms を文字列 → 配列 に戻す処理
+    const groupHomes = results.map(row => ({
+      ...row,
+      residentRooms: JSON.parse(row.residentRooms)
+    }));
+
+    res.json(groupHomes);
+  });
+});
+
