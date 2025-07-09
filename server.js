@@ -61,3 +61,24 @@ app.get('/attendance', (req, res) => {
   });
 });
 
+app.post('/group-home', (req, res) => {
+  const { propertyName, unitName, postalCode, address, phoneNumber, commonRoom, residentRooms, openingDate } = req.body;
+
+  const query = 'INSERT INTO group_homes (property_name, unit_name, postal_code, address, phone_number, common_room, resident_rooms, opening_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+
+  const residentRoomsString = residentRooms.join(','); // 配列を文字列にする
+
+  connection.query(
+    query,
+    [propertyName, unitName, postalCode, address, phoneNumber, commonRoom, residentRoomsString, openingDate],
+    (err, results) => {
+      if (err) {
+        console.error('DB挿入エラー:', err);
+        return res.status(500).json({ message: 'データ保存に失敗しました' });
+      }
+
+      res.json({ message: 'グループホームの情報を保存しました' });
+    }
+  );
+});
+
